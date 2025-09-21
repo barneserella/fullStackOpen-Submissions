@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
 
 
 const App = () => {
@@ -34,51 +37,22 @@ const App = () => {
     setNewNumber('')
   }
 
-  const handleNewPersons = (event) => {
-    console.log(event.target.value)
-    setNewName(event.target.value)
-  }
-
-  const handleNewNumber = (event) => {
-    console.log(event.target.value)
-    setNewNumber(event.target.value)
-  }
-
-  const filteredNames = persons.filter(person => person.name.toLowerCase().includes(newSearch.toLowerCase()))
-  console.log(filteredNames)
-  
+ 
 
   return (
     <div>
       <h2>Phonebook</h2>
 
-      <div>filter shown with <input value={newSearch} onChange={(event) => setNewSearch(event.target.value)} /></div>
+      <Filter newSearch={newSearch} setNewSearch={setNewSearch} />
 
       <h2>add a new</h2>
 
-      <form onSubmit={addName}>
-        <div>
-          name: <input value={newName} onChange={handleNewPersons} />
-        </div>
-        <div>number: <input value={newNumber} onChange={handleNewNumber} /></div>
-      
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm addName={addName} newName={newName} setNewName={setNewName} newNumber={newNumber} setNewNumber={setNewNumber} />
+
       <h2>Numbers</h2>
-      <ul>
-        {newSearch ? 
-          filteredNames.map(person => (
-            <li key={person.name}>{person.name}</li>
-          ))
-          :
-        
-        persons.map(person => (
-          <li key={person.name}>{person.name} {person.phoneNumber}</li>
-        ))
-        }
-      </ul>
+      
+      <Persons  newSearch={newSearch} persons={persons}  />
+
     </div>
   )
 }
