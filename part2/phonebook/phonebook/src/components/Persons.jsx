@@ -1,23 +1,20 @@
 
 
-const Persons = ({ newSearch, persons}) => {
+const Persons = ({ newSearch, persons, deletePersons}) => {
     
-   
-    console.log('newSearch: ', newSearch, 'Persons: ',persons)
-
     const filteredNames = persons.filter(person => person.name.toLowerCase().includes(newSearch.toLowerCase()))
-  console.log(filteredNames)
+    console.log(filteredNames)
 
     return (
         <ul>
         {newSearch ? 
           filteredNames.map(person => (
-            <li key={person.name}>{person.name} {person.phoneNumber}</li>
+            <li key={person.name}>{person.name} {person.phoneNumber} <button id={person.id}>delete person</button></li>
           ))
           :
         
         persons.map(person => (
-          <li key={person.name}>{person.name} {person.phoneNumber}</li>
+          <li key={person.name}>{person.name} {person.phoneNumber} <button id={person.id} onClick={deletePersons} >delete person</button></li>
         ))
         }
         </ul>
