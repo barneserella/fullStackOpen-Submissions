@@ -1,4 +1,4 @@
-const Country = ( {countryName, countryLanguages, imageOfFlag, area, capital} ) => {
+const Country = ( {countryName, countryLanguages, imageOfFlag, area, capital, temperature, wind, imageIcon} ) => {
     return (
         <div>
             <h1>{countryName}</h1>
@@ -15,6 +15,13 @@ const Country = ( {countryName, countryLanguages, imageOfFlag, area, capital} ) 
             </ul>
             <img src={imageOfFlag} alt="image of country flag" />
 
+            <h3>Weather in {capital}</h3>
+
+            <div>Temperature {temperature} C</div>
+
+            <img src={imageIcon} alt="weather image" />
+
+            <div>Wind {wind} mph</div>
         </div>
     )
 }
