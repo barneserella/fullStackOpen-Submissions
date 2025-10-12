@@ -1,7 +1,18 @@
 const express = require('express');
 const app = express();
+const morgan = require("morgan");
 
 app.use(express.json());
+
+//Logging
+app.use(morgan("tiny"));
+
+morgan.token('body', (req) => {
+  return JSON.stringify(req.body);
+});
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
+
 
 let persons = [
     { 
@@ -58,7 +69,7 @@ const generateId = () => {
 
 app.post('/api/persons', (req, res) => {
   const body = req.body
-  const nameExists = persons.find(person => person.name.toLowerCase() === body.name.toLowerCase())
+  const nameExists = persons.find(person => person.name.trim().toLowerCase() === body.name?.trim().toLowerCase())
 
   if(nameExists){
     return res.status(400).json({
