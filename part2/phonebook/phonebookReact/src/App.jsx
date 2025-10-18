@@ -34,7 +34,7 @@ const App = () => {
     if(nameExists){
       if(window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)){
 
-        const updatedPerson = { ...nameExists, phoneNumber: newNumber }
+        const updatedPerson = { ...nameExists, number: newNumber }
 
         personsService
           .update(nameExists.id, updatedPerson)
@@ -61,7 +61,7 @@ const App = () => {
 
       const personObject = {
       name: newName,
-      phoneNumber: newNumber
+      number: newNumber
     }
 
     personsService
@@ -91,7 +91,7 @@ const App = () => {
 
     const personObject = {
       name: event.target.name,
-      phoneNumber: event.target.phoneNumber
+      number: event.target.number
     }
 
     if(window.confirm(`Delete entry?`)){
