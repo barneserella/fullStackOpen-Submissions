@@ -1,10 +1,20 @@
-const express = require('express');
 require('dotenv').config()
-const app = express();
+const express = require('express');
 const Note = require('./models/note')
 
-app.use(express.json());
+const app = express();
+
+const requestLogger = (req, res, next) => {
+  console.log('Method:', req.method)
+  console.log('Path:  ', req.path)
+  console.log('Body:  ', req.body)
+  console.log('---')
+  next()
+}
+
+app.use(requestLogger)
 app.use(express.static('dist'));
+app.use(express.json());
 
 // let notes = [
 //   {
@@ -34,10 +44,15 @@ app.get('/api/notes', (req, res) => {
   })
 })
 
-app.get('/api/notes/:id', (req, res) => {
+app.get('/api/notes/:id', (req, res, next) => {
   Note.findById(req.params.id).then(note => {
-    res.json(note)
+    if (note) {
+        res.json(note)
+      } else {
+        res.status(404).end()
+      }
   })
+  .catch(error => next(error))
 })
 
 // const generateId = () => {
@@ -66,12 +81,51 @@ app.post('/api/notes', (req, res) => {
   })
 })
 
-app.delete('/api/notes/:id', (req, res) => {
-  const id = req.params.id
-  notes = notes.filter(note => note.id !== id)
+app.put('/api/notes/:id', (req, res, next) => {
+  const { content, important } = req.body
 
-  res.status(204).end()
+  Note.findById(req.params.id)
+  .then(note => {
+    if(!note) {
+      return res.status(404).end()
+    }
+
+    note.content = content
+    note.important = important
+
+    return note.save().then((updatedNote) => {
+      res.json(updatedNote)
+    })
+  })
+  .catch(error => next(error))
 })
+
+app.delete('/api/notes/:id', (req, res, next) => {
+  Note.findByIdAndDelete(req.params.id)
+    .then(res => {
+      res.status(204).end()
+    })
+    .catch(error => next(error))
+})
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
+// this has to be the last loaded middleware, also all the routes should be registered before this!
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {

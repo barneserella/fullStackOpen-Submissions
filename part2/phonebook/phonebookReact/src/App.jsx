@@ -17,19 +17,19 @@ const App = () => {
   useEffect(() => {
     personsService
       .getAll()
-      .then(person => {
+      .then(persons => {
         console.log('promise fulfilled')
-        setPersons(person)
+        setPersons(persons)
       })
   }, [])
   console.log('render', persons.length, 'persons')
  
   const addName = (event) => {
-    event.preventDefault()
+    // event.preventDefault()
 
     const nameExists = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
 
-    console.log(nameExists)
+    console.log('nameExistsReact: ', nameExists)
 
     if(nameExists){
       if(window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)){
@@ -49,9 +49,9 @@ const App = () => {
             }, 5000)
           })
           .catch(err => {
-            console.error(`Error updating ${newName}, person already deleted from server: `, err)
+            console.error(`Error updating ${newName}:`, err)
             setErrorMessage(`Error updating ${newName}, person already deleted from server.`)
-            setPersons(persons.filter(person => person.id !== nameExists.id))
+            // setPersons(persons.filter(person => person.id !== nameExists.id))
             setTimeout(() => {
               setErrorMessage(null)
             }, 5000)
@@ -95,10 +95,9 @@ const App = () => {
     }
 
     if(window.confirm(`Delete entry?`)){
+
     personsService
-     
       .remove(id, personObject)
-    
       .then(() => {
         
           setPersons(persons.filter(person => id !== person.id))

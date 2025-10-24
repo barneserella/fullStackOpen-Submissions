@@ -34,10 +34,12 @@ app.get('/api/persons', (req, res) => {
     })
 })
 
-// app.get('/api/persons/info', (req, res) => {
-//   res.send(`<h2>Phonebook has info for ${persons.length} people.</h2>
-//                 <div>${Date()}</div>`)
-// })
+app.get('/api/persons/info', (req, res, next) => {
+    Person.find({}).then(persons => {
+      res.json(`Phonebook has info for ${persons.length} people.
+                ${Date()}`)
+    }).catch(error => next(error))
+})
 
 app.get('/api/persons/:id', (req, res) => {
     Person.findById(req.params.id).then(person => {
@@ -45,42 +47,46 @@ app.get('/api/persons/:id', (req, res) => {
     })
 })
 
-// app.delete('/api/persons/:id', (req, res) => {
-//   const id = req.params.id
-//   persons = persons.filter(person => person.id !== id)
-
-//   res.status(204).end()
-// })
-
 // const generateId = () => {
 //     return Math.floor(Math.random() * 100000) + 1
 // }
 
 app.post('/api/persons', (req, res) => {
   const body = req.body
-  
-  // const nameExists = Person.find(person => person.name.toLowerCase() === body.name.toLowerCase())
-
-  // if(nameExists){
-  //   return res.status(400).json({
-  //       error: "Name already in phonebook."
-  //   })
-  // }
 
   if(!body.name || !body.number){
     return res.status(400).json({
         error: 'name or number missing'
     })
   }
-
-  const person = new Person({
-    name: body.name,
-    number: body.number,
-  })
+        const person = new Person({
+                          name: body.name,
+                          number: body.number,
+                      })
  
-  person.save().then(savedPerson =>{
-    res.json(savedPerson)
+        person.save().then(savedPerson =>{
+        res.json(savedPerson)
+        })
+      
+    })
+
+app.put('/api/persons/:id', (req, res, next) => {
+    const { name, number } = req.body
+
+    Person.findByIdAndUpdate( 
+        req.params.id,  
+        { name, number },
+    )
+    
+    .catch(error => next(error))
+})
+
+app.delete('/api/persons/:id', (req, res, next) => {
+  Person.findByIdAndDelete(req.params.id)
+    .then(result => {
+      res.status(204).end()
   })
+  .catch(error => next(error))
 })
 
 const unknownEndpoint = (req, res) => {
@@ -88,6 +94,19 @@ const unknownEndpoint = (req, res) => {
 }
 
 app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
+// this has to be the last loaded middleware, also all the routes should be registered before this!
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT)
