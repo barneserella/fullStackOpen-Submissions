@@ -8,13 +8,19 @@ const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(true)
-  const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [message, setMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
       noteService
         .getAll()
         .then(initialNotes => {
           setNotes(initialNotes)
+          setMessage('initial notes')
+          setTimeout(() => {
+            setMessage(null)},
+            5000
+          )
         })
   }, [])
 
@@ -29,8 +35,20 @@ const App = () => {
       .create(noteObject)
       .then(returnedNote => {
         setNotes(notes.concat(returnedNote))
+        setMessage('note created')
         setNewNote('')
+        setTimeout(() => {
+          setMessage(null)},
+          5000
+        )
       })
+      .catch(err => {
+            console.error('Error adding note:', err)
+            setErrorMessage('Error adding new note')
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+          })
   }
 
   const handleNoteChange = (event) => {
@@ -39,6 +57,7 @@ const App = () => {
   
   const toggleImportanceOf = (id) => {
     const note = notes.find(n => n.id === id)
+    console.log(note)
     const changedNote = { ...note, important: !note.important }
 
     noteService 
@@ -47,6 +66,7 @@ const App = () => {
         setNotes(notes.map(note => note.id === id ? returnedNote : note))
       })
       .catch(error => {
+        console.error(error)
       setErrorMessage(
         `Note '${note.content}' was already deleted from server`
       )
@@ -62,7 +82,11 @@ const App = () => {
   return (
     <div>
       <h1>Notes</h1>
-      <Notification message={errorMessage} />
+
+      {message ? 
+      <Notification message={message} /> :
+      <Notification message={errorMessage} />}
+
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? 'important' : 'all'}

@@ -28,10 +28,10 @@ app.use(express.json());
 //     }
 // ]
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
     Person.find({}).then(persons => {
       res.json(persons)
-    })
+    }).catch(error => next(error))
 })
 
 app.get('/api/persons/info', (req, res, next) => {
@@ -41,17 +41,17 @@ app.get('/api/persons/info', (req, res, next) => {
     }).catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id).then(person => {
       res.json(person)
-    })
+    }).catch(error => next(error))
 })
 
 // const generateId = () => {
 //     return Math.floor(Math.random() * 100000) + 1
 // }
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body
 
   if(!body.name || !body.number){
@@ -67,6 +67,7 @@ app.post('/api/persons', (req, res) => {
         person.save().then(savedPerson =>{
         res.json(savedPerson)
         })
+        .catch(error => next(error))
       
     })
 
@@ -76,7 +77,15 @@ app.put('/api/persons/:id', (req, res, next) => {
     Person.findByIdAndUpdate( 
         req.params.id,  
         { name, number },
+        { 
+      new: true, 
+      runValidators: true,  // Enable validators
+      context: 'query'      
+    }
     )
+    .then(updatedPerson => {
+      res.json(updatedPerson)
+    })
     
     .catch(error => next(error))
 })
@@ -100,7 +109,9 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } 
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
 
   next(error)
 }

@@ -62,7 +62,7 @@ app.get('/api/notes/:id', (req, res, next) => {
 //   return String(maxId + 1)
 // }
 
-app.post('/api/notes', (req, res) => {
+app.post('/api/notes', (req, res, next) => {
   const body = req.body
 
   if(!body.content){
@@ -79,6 +79,7 @@ app.post('/api/notes', (req, res) => {
   note.save().then(savedNote => {
     res.json(savedNote)
   })
+  .catch(error => next(error))
 })
 
 app.put('/api/notes/:id', (req, res, next) => {
@@ -122,7 +123,7 @@ const errorHandler = (error, request, response, next) => {
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
   }
-  
+
   next(error)
 }
 

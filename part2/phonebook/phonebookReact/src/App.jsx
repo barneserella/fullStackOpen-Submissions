@@ -25,7 +25,7 @@ const App = () => {
   console.log('render', persons.length, 'persons')
  
   const addName = (event) => {
-    // event.preventDefault()
+    event.preventDefault()
 
     const nameExists = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
 
@@ -48,9 +48,9 @@ const App = () => {
               setMessage(null)
             }, 5000)
           })
-          .catch(err => {
-            console.error(`Error updating ${newName}:`, err)
-            setErrorMessage(`Error updating ${newName}, person already deleted from server.`)
+          .catch(error => {
+            console.error(`Error updating ${newName}:`, error)
+            setErrorMessage(error.response.data.error)
             // setPersons(persons.filter(person => person.id !== nameExists.id))
             setTimeout(() => {
               setErrorMessage(null)
@@ -75,8 +75,12 @@ const App = () => {
               setMessage(null)
             }, 5000)
           })
-          .catch(err => {
-            console.error('Error adding person :', err)
+          .catch(error => {
+            setErrorMessage(error.response.data.error)
+            console.error('Error adding person :', error)
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
           })
     
     
