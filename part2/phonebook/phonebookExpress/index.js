@@ -1,50 +1,48 @@
 require('dotenv').config()
-const express = require('express');
-const app = express();
+const express = require('express')
+const app = express()
 const Person = require('./models/person')
 
-app.use(express.json());
+app.use(express.json())
 
 // let persons = [
-//     { 
-//       "id": "1",
-//       "name": "Arto Hellas", 
-//       "number": "040-123456"
-//     },
-//     { 
+//     {//       "id": "1",
+//       "name": "Arto Hellas",
+//       "number": "040-123456"//     },
+//     {
 //       "id": "2",
-//       "name": "Ada Lovelace", 
+//      "name": "Ada Lovelace",
 //       "number": "39-44-5323523"
 //     },
-//     { 
+//     {
 //       "id": "3",
-//       "name": "Dan Abramov", 
+//       "name": "Dan Abramov",
 //       "number": "12-43-234345"
 //     },
-//     { 
+//     {
 //       "id": "4",
-//       "name": "Mary Poppendieck", 
+//       "name": "Mary Poppendieck",
 //       "number": "39-23-6423122"
 //     }
 // ]
 
 app.get('/api/persons', (req, res, next) => {
-    Person.find({}).then(persons => {
-      res.json(persons)
-    }).catch(error => next(error))
+  Person.find({}).then(persons => {
+    res.json(persons)
+  }).catch(error => next(error))
 })
 
 app.get('/api/persons/info', (req, res, next) => {
-    Person.find({}).then(persons => {
-      res.json(`Phonebook has info for ${persons.length} people.
-                ${Date()}`)
-    }).catch(error => next(error))
+  Person.find({}).then(persons => {
+    res.json(`Phonebook has info for ${persons.length} people.
+              ${Date()}`)
+  }).catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
-    Person.findById(req.params.id).then(person => {
-      res.json(person)
-    }).catch(error => next(error))
+  Person.findById(req.params.id).then(person => {
+    res.json(person)
+  }).catch(error => next(error))
 })
 
 // const generateId = () => {
@@ -56,37 +54,36 @@ app.post('/api/persons', (req, res, next) => {
 
   if(!body.name || !body.number){
     return res.status(400).json({
-        error: 'name or number missing'
+      error: 'name or number missing'
     })
   }
-        const person = new Person({
-                          name: body.name,
-                          number: body.number,
-                      })
- 
-        person.save().then(savedPerson =>{
-        res.json(savedPerson)
-        })
-        .catch(error => next(error))
-      
-    })
+
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  })
+
+  person.save().then(savedPerson => {
+    res.json(savedPerson)
+  })
+    .catch(error => next(error))
+})
 
 app.put('/api/persons/:id', (req, res, next) => {
-    const { name, number } = req.body
+  const { name, number } = req.body
 
-    Person.findByIdAndUpdate( 
-        req.params.id,  
-        { name, number },
-        { 
-      new: true, 
+  Person.findByIdAndUpdate(
+    req.params.id,
+    { name, number },
+    {
+      new: true,
       runValidators: true,  // Enable validators
-      context: 'query'      
+      context: 'query'
     }
-    )
+  )
     .then(updatedPerson => {
       res.json(updatedPerson)
     })
-    
     .catch(error => next(error))
 })
 
@@ -94,8 +91,8 @@ app.delete('/api/persons/:id', (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
     .then(result => {
       res.status(204).end()
-  })
-  .catch(error => next(error))
+    })
+    .catch(error => next(error))
 })
 
 const unknownEndpoint = (req, res) => {
