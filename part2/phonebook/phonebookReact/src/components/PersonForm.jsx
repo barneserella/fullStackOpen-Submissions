@@ -1,5 +1,3 @@
-
-
 const PersonForm = ({addName, newName, setNewName, newNumber, setNewNumber}) => {
     
 
