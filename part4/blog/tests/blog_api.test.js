@@ -91,6 +91,44 @@ test('blog without title or url is not added', async () => {
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
 })
 
+test('succeeds with status code 204 if id is valid', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToDelete = blogsAtStart[0]
+
+      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+
+      const blogsAtEnd = await helper.blogsInDb()
+
+      const titles = blogsAtEnd.map(n => n.title)
+      assert(!titles.includes(blogToDelete.title))
+
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+})
+
+test('a valid blog can be updated', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+
+  const updatedBlog = {
+        title: 'new blog title',
+        author: 'new blog author',
+        url: 'new blog url',
+        likes: 112,
+  }
+
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlog)
+    .expect(200)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  assert.strictEqual(blogsAtEnd.length, blogsAtStart.length)
+
+  const updated = blogsAtEnd.find(b => b.id === blogToUpdate.id)
+  assert.strictEqual(updated.likes, 112)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
