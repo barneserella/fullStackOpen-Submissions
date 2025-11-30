@@ -1,0 +1,8 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRhd255YSIsImlkIjoiNjkyYjY4NjJiNjM5M2YxNjY3ZWQ0MzlmIiwiaWF0IjoxNzY0NDUyNTAwLCJleHAiOjE3NjQ0NTYxMDB9.7dJTdYAC_aG95lVDDunscMHx8ckg1DWHuIrawq7NT6M
+
+{
+    "title": "Tawnya's Blog3",
+    "url": "tawnyaBlogURL3"
+}
