@@ -1,7 +1,9 @@
-const jwt = require('jsonwebtoken')
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const tokenExtractor = require('../utils/middleware')
+const userExtractor = require('../utils/middleware')
+
 
 blogsRouter.get('/', async (req, res) => {
     const blogs = await Blog
@@ -18,37 +20,25 @@ blogsRouter.get('/:id', async (req, res) => {
         }
 })
 
-// const getTokenFrom = request => {
-//   const authorization = request.get('authorization')
-//   if (authorization && authorization.startsWith('Bearer ')) {
-//     return authorization.replace('Bearer ', '')
-//   }
-//   return null
-// }
-
-blogsRouter.post('/', async (req, res) => {
+blogsRouter.post('/', userExtractor.userExtractor, tokenExtractor.tokenExtractor, async (req, res) => {
     const body = req.body
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!decodedToken.id) {
-        return response.status(401).json({ error: 'token invalid' })
-    } 
-    const user = await User.findById(decodedToken.id)
+    const user = req.user
     
     if(!user){
-        return response.status(400).json({ error: 'UserId missing or not valid' })
+        return res.status(400).json({ error: 'token missing or not valid' })
+    }
+    if(!body.title || !body.url){
+        return res.status(400).json({ error: 'title and url are required' })
     }
     
     const blog = new Blog({
         title: body.title,
-        author: user.name,
+        author: body.author,
         url: body.url,
         likes: body.likes || 0,
         user: user._id
     })
 
-    if(!body.title || !body.url){
-        return res.status(400).json({ error: 'title and url are required' })
-    }
     
     const savedBlog = await blog.save()
 
@@ -59,9 +49,25 @@ blogsRouter.post('/', async (req, res) => {
     
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id)
-  response.status(204).end()
+blogsRouter.delete('/:id', userExtractor.userExtractor, tokenExtractor.tokenExtractor, async (request, response) => {
+    const user = request.user
+    const blogId = request.params.id
+    const blog = await Blog.findById(blogId)
+
+    if(!blog) {
+        return response.status(404).json({ error: 'blog not found' })
+    }
+
+    if(blog.user.toString() !== user._id.toString()) {
+        return response.status(401).json({ error: 'not authorized to delete this blog'})
+    }
+
+    await Blog.findByIdAndDelete(blogId)
+
+    user.blogs = user.blogs.filter(blog => blog.toString() !== blogId.toString())
+    await user.save()
+
+    return response.status(204).end()
 })
 
 blogsRouter.put('/:id', async (request, response) => {

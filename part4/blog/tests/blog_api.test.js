@@ -1,16 +1,41 @@
 const assert = require('node:assert')
 const { test, after, beforeEach } = require('node:test')
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
+let loggedInToken;
 beforeEach(async () => {
   await Blog.deleteMany({})
-  await Blog.insertMany(helper.initialBlogs)
+
+  await User.deleteMany({})
+
+  const passwordHash = await bcrypt.hash('sekret', 10)
+  const user = new User({ username: 'root', passwordHash })
+
+  await user.save()
+
+  const response = await api
+    .post('/api/login')
+    .send({
+      username: 'root',
+      password: 'sekret'
+    })
+
+    loggedInToken = response.body.token
+
+    const blogsWithUser = helper.initialBlogs.map(b => ({ 
+      ...b,
+      user: user._id
+    }))
+
+    await Blog.insertMany(blogsWithUser)
 })
 
 test('blogs are returned as json', async () => {
@@ -48,6 +73,7 @@ test('a valid blog can be added ', async () => {
   await api
     .post('/api/blogs')
     .send(newBlog)
+    .set({ Authorization: `Bearer ${loggedInToken}` })
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
@@ -69,6 +95,7 @@ test('blog without likes is defaulted to 0', async () => {
 
   const response = await api
     .post('/api/blogs')
+    .set({ Authorization: `Bearer ${loggedInToken}` })
     .send(newBlog)
     .expect(201)
 
@@ -83,6 +110,7 @@ test('blog without title or url is not added', async () => {
 
   await api
     .post('/api/blogs')
+    .set({ Authorization: `Bearer ${loggedInToken}` })
     .send(newBlog)
     .expect(400)
 
@@ -95,7 +123,10 @@ test('succeeds with status code 204 if id is valid', async () => {
       const blogsAtStart = await helper.blogsInDb()
       const blogToDelete = blogsAtStart[0]
 
-      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+      await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set({ Authorization: `Bearer ${loggedInToken}` })
+      .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
 
