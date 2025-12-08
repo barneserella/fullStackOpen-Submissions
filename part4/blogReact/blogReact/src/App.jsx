@@ -39,6 +39,27 @@ function App() {
   return (
     <>
       <h1>Blogs</h1>
+
+      {message ? 
+      <Notification  style={{
+    color: 'green',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }} message={message} /> :
+      <Notification  style={{
+    color: 'red',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }} message={errorMessage} />}
+
       <ul>
         {Array.isArray() && blogs.length > 1 ? blogs.map((blog) => (
           <li>{blog.title}</li> )) : 
