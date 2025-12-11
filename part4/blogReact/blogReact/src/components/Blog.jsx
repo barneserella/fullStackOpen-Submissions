@@ -1,9 +1,7 @@
-const Blog = ({ blogs }) => {
+const Blog = ({ blog }) => {
   return (
     <div className='blog'>
-        {blogs[0].title}
-        {blogs[0].author}
-        {blogs[0].content}      
+        {blog.title} {blog.author}   
     </div>
   )
 }
