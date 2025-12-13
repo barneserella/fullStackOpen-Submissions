@@ -17,6 +17,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [loginVisible, setLoginVisible] = useState(false)
 
   useEffect(() => {
     blogService.getAll().then((initialBlogs) => {
