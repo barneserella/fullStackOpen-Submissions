@@ -51,7 +51,9 @@ blogsRouter.post('/', userExtractor.userExtractor, tokenExtractor.tokenExtractor
 
 blogsRouter.delete('/:id', userExtractor.userExtractor, tokenExtractor.tokenExtractor, async (request, response) => {
     const user = request.user
+    console.log(user)
     const blogId = request.params.id
+    console.log(blogId)
     const blog = await Blog.findById(blogId)
 
     if(!blog) {
@@ -71,7 +73,8 @@ blogsRouter.delete('/:id', userExtractor.userExtractor, tokenExtractor.tokenExtr
 })
 
 blogsRouter.put('/:id', async (request, response) => {
-    const { title, author, url, likes } = request.body
+    console.log('USER FROM REQUEST BODY:', request.body.user)
+    const { title, author, url, likes, user } = request.body
 
     const blog = await Blog.findById(request.params.id)
     if(!blog){
@@ -82,9 +85,13 @@ blogsRouter.put('/:id', async (request, response) => {
     blog.author = author
     blog.url = url
     blog.likes = likes
+    blog.user = user.id
 
     const updatedBlog = await blog.save()
-    response.json(updatedBlog)
+
+    const populatedBlog = await updatedBlog.populate('user', { username: 1, name: 1 })
+
+    response.json(populatedBlog)
 })
 
 module.exports = blogsRouter

@@ -1,31 +1,35 @@
-const BlogForm = ({ addBlog, newTitle, setNewTitle, newAuthor, setNewAuthor, newContent, setNewContent }) => {
-    
-    const handleNewTitle = (event) => {
-        console.log(event.target.value)
-        setNewTitle(event.target.value)
-    }
+import { useState } from "react";
 
-    const handleNewAuthor = (event) => {
-        console.log(event.target.value)
-        setNewAuthor(event.target.value)
-    }
+const BlogForm = ({ createBlog }) => {
+  const [newTitle, setNewTitle] = useState('')
+  const [newAuthor, setNewAuthor] = useState('')
+  const [newUrl, setNewUrl] = useState('')
 
-    const handleNewContent = (event) => {
-        console.log(event.target.value)
-        setNewContent(event.target.value)
-    }
+  const addBlog = (event) => {
+    event.preventDefault();
+    createBlog({
+      title: newTitle,
+      author: newAuthor,
+      url: newUrl,
+    });
+
+    setNewTitle('')
+    setNewAuthor('')
+    setNewUrl('')
+  } 
 
   return (
     <>
     <form onSubmit={addBlog}>
         <div>
-          Title: <input value={newTitle} onChange={handleNewTitle} />
+          Title: <input value={newTitle} onChange={event => setNewTitle(event.target.value)} />
         </div>
         <div>
-          Author: <input value={newAuthor} onChange={handleNewAuthor} />
+          Author: <input value={newAuthor} onChange={event => setNewAuthor(event.target.value)} />
         </div>
-        <div>Blog Post: 
-            <textarea value={newContent} onChange={handleNewContent} />
+        <div>
+          URL: 
+            <input value={newUrl} onChange={event => setNewUrl(event.target.value)} />
         </div>
       
         <div>

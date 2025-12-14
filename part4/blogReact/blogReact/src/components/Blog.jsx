@@ -1,7 +1,38 @@
-const Blog = ({ blog }) => {
+import { useState } from "react"
+
+const Blog = ({ blog, updateBlog, deleteBlog }) => {
+    const [visible, setVisible] = useState(false)
+
+    const hideWhenVisible = { display: visible ? 'none' : '' }
+    const showWhenVisible = { display: visible ? '' : 'none' }
+
+    const toggleVisibility = () => {
+        setVisible(!visible)
+    }
+
+    const blogStyle = {
+      paddingTop: 10,
+      paddingLeft: 2,
+      border: 'solid',
+      borderWidth: 1,
+      marginBottom: 5
+    }
+  
   return (
     <div className='blog'>
-        {blog.title} {blog.author}   
+        
+          <div style={blogStyle}>
+            <div style={hideWhenVisible}>{blog.title} {blog.author}<button onClick={toggleVisibility}>view</button></div>
+          <div style={showWhenVisible}>
+            {blog.title} {blog.author}<button onClick={toggleVisibility}>hide</button><br/>
+            {blog.url}<br/>
+            {blog.likes}<button onClick={() => updateBlog(blog.id)} >like</button><br/>
+            {blog.user.name}<br/>
+            <button onClick={() => deleteBlog(blog.id)}>remove</button>
+          </div>
+          </div>
+        
+          
     </div>
   )
 }
