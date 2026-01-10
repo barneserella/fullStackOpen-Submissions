@@ -1,10 +1,10 @@
 const Footer = () => {
-    const footerStyle = {
-        color: 'green',
-        fontStyle: 'italic'
-    }
+  const footerStyle = {
+    color: 'green',
+    fontStyle: 'italic'
+  }
 
-    return (
+  return (
     <div style={footerStyle}>
       <br />
       <p>
@@ -14,4 +14,4 @@ const Footer = () => {
   )
 }
 
-export default Footer;
+export default Footer

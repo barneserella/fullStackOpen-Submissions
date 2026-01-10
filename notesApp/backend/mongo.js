@@ -27,7 +27,7 @@ const note = new Note({
 
 note.save().then((result) => {
   console.log('note saved!')
-  
+
 })
 
 Note.find({}).then(result => {

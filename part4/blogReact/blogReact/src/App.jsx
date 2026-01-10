@@ -27,6 +27,7 @@ function App() {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      console.log('App.jsx-useEffect, user: ', user)
       blogService.setToken(user.token)
     }
   }, [])
@@ -53,8 +54,9 @@ function App() {
   };
 
   const updateBlog = (id) => {
+    console.log('App.jsx-updateBlog, id: ', id)
     const blog = blogs.find(blog => blog.id === id)
-    console.log(blog)
+    console.log('App.jsx-updateBlog, blog: ', blog)
     const { likes, ...rest } = blog
     const updatedLikes = likes + 1
     const changedBlog = { ...blog, likes: updatedLikes  }
@@ -76,9 +78,9 @@ function App() {
     if(window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}`)){
 
     blogService
-      .remove(id, blogObject)
+      .remove(id)
       .then(deletedBlog => {
-        setBlogs(blogs.filter(deletedBlog.id !== id))
+        setBlogs(blogs.filter(blog => blog.id !== id))
         setMessage('Blog deleted successfully')
         setTimeout(() => {
           setMessage('')
@@ -189,7 +191,7 @@ function App() {
         {blogs
           .sort((a, b) => b.likes - a.likes)
           .map(blog => 
-            <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
+            <Blog key={blog.id} blog={blog} user={user} updateBlog={updateBlog} deleteBlog={deleteBlog} />
         )}
         
       </ul>
