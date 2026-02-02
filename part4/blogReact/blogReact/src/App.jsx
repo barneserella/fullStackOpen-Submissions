@@ -14,7 +14,7 @@ function App() {
   const [user, setUser] = useState(null)
   const [message, setMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  const [loginVisible, setLoginVisible] = useState(false)
+  const [loginVisible, setLoginVisible] = useState(true)
 
   useEffect(() => {
     blogService.getAll().then((initialBlogs) => {
@@ -129,9 +129,9 @@ function App() {
 
     return (
       <>
-        <div style={hideWhenVisible}>
+        {/* <div style={hideWhenVisible}>
           <button onClick={() => setLoginVisible(true)}>login</button>
-        </div>
+        </div> */}
         <div style={showWhenVisible}>
           <LoginForm
             username={username}
@@ -173,7 +173,7 @@ function App() {
         }} message={errorMessage} />
       )}
 
-      <h2>Login</h2>
+      {/* <h2>Login</h2> */}
       {!user && loginForm()}
       {user && (
         <div>
